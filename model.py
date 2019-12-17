@@ -204,8 +204,3 @@ class gwnet(nn.Module):
         x = F.relu(self.end_conv_1(x))
         x = self.end_conv_2(x)
         return x
-
-
-
-
-
