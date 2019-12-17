@@ -92,7 +92,11 @@ def main():
     his_loss =[]
     val_time = []
     train_time = []
+
+
+
     if(1):
+        # 1. Train
         for i in range(1,args.epochs+1):
             #if i % 10 == 0:
                 #lr = max(0.000002,args.learning_rate * (0.1 ** (i // 10)))
@@ -103,7 +107,8 @@ def main():
             train_rmse = []
             t1 = time.time()
             dataloader['train_loader'].shuffle()
-            for iter, (x, y) in enumerate(dataloader['train_loader'].get_iterator()):
+            iteretor=enumerate(dataloader['train_loader'].get_iterator())
+            for iter, (x, y) in iteretor:
                 trainx = torch.Tensor(x).to(device)
                 trainx= trainx.transpose(1, 3)
                 trainy = torch.Tensor(y).to(device)
@@ -115,6 +120,7 @@ def main():
                 if iter % args.print_every == 0 :
                     log = 'Iter: {:03d}, Train Loss: {:.4f}, Train MAPE: {:.4f}, Train RMSE: {:.4f}'
                     print(log.format(iter, train_loss[-1], train_mape[-1], train_rmse[-1]),flush=True,file=logf)
+                    print(log.format(iter, train_loss[-1], train_mape[-1], train_rmse[-1]),flush=True)
                     # break
             t2 = time.time()
             train_time.append(t2-t1)
@@ -123,7 +129,7 @@ def main():
             valid_mape = []
             valid_rmse = []
 
-
+         #2. Test
             s1 = time.time()
             for iter, (x, y) in enumerate(dataloader['val_loader'].get_iterator()):
                 testx = torch.Tensor(x).to(device)
@@ -153,8 +159,9 @@ def main():
         print("Average Training Time: {:.4f} secs/epoch".format(np.mean(train_time)),file=logf)
         print("Average Inference Time: {:.4f} secs".format(np.mean(val_time)),file=logf)
 
-    #testing
-    bestid = np.argmin(his_loss)
+    #3. Best Testing.
+    #   for the best model with least loss.
+    bestid = np.argmin(his_loss) # collect the best result model
     engine.model.load_state_dict(torch.load(args.save+"_epoch_"+str(bestid+1)+"_"+str(round(his_loss[bestid],2))+".pth"))
 
 
